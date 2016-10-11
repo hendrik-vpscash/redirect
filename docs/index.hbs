@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Redirect manager</title>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css"/>
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-old-ie-min.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
+        <!--<![endif]-->
+        <link rel="stylesheet"
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.12/datatables.min.css"/>
+
+        <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.12/datatables.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css">
+    </head>
+    <body>
+        <form class="pure-form" method="GET">
+            <fieldset>
+                <legend>Create a new entry</legend>
+                <input type="text" name="domain" placeholder="domain">
+                <input type="text" name="target" placeholder="target">
+                <button type="submit" name="create" value="1" class="pure-button pure-button-primary">Create</button>
+            </fieldset>
+        </form>
+
+        <hr>
+
+        <table id="data">
+            <thead>
+                <tr>
+                    <th>Domain</th>
+                    <th>Target</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each row}}
+                    <tr><td>{{domain}}</td><td>{{target}}</td><td><a href="?delete={{domainEncoded}}"><i class="fa fa-trash"></i></a></td></tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <script type="text/javascript">
+            $("#data").DataTable();
+        </script>
+    </body>
+</html>
