@@ -131,6 +131,14 @@ var server = http.createServer(function(request, response) {
         }
 
         if (uri!='/login.html' && !/\/assets.*\//.test(uri)) {
+
+          // This handles closing the response
+          if (!config.admin.firewall(request,response)) {
+            response.writeHead(403);
+            response.write('Permission denied');
+            return response.end();
+          }
+
           return auth(request)
             .then(function(username) {
 
