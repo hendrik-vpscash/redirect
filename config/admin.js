@@ -7,7 +7,8 @@ module.exports.admin = {
     'robin@vpscash'  : 'aEBmq9G7cFeNlHVYD+Qnp5CkbhQmgd1bHbfLC5s97j4=',
     'stephan@vpscash': 'Zvzex2bSGjQ5hzcfIavhhrbL9We4vhaxN55QXcUXMxk=',
     'henk@vpscash'   : 'B47o/8fIg4+LSZ1w5VgH4VzDI9ed2NpteI6eKeOHgLY=',
-    'gaby@vpscash'   : 'AzJdsLwXzQ/wT6Q+SJzzzm7jGKrMwEI1IzkAM9aB+UQ='
+    'gaby@vpscash'   : 'AzJdsLwXzQ/wT6Q+SJzzzm7jGKrMwEI1IzkAM9aB+UQ=',
+    'michiel@vpscash': 'Uf9c5Dr9ogcmhxwYPsRr2mPIHREWjMLNqzeRc4hUrks='
   },
 
   hosts: [
