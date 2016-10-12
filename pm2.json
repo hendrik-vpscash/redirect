@@ -5,9 +5,44 @@
       "script": "./app.js",
       "name": "web.0",
       "node_args": [],
-      "env": {},
+      "env": {
+        "PORT": 5000
+      },
       "error_file": "./web.0.err.log",
       "out_file": "./web.0.out.log"
+    },
+    {
+      "exec_mode": "fork_mode",
+      "script": "./app.js",
+      "name": "web.1",
+      "node_args": [],
+      "env": {
+        "PORT": 5100
+      },
+      "error_file": "./web.1.err.log",
+      "out_file": "./web.1.out.log"
+    },
+    {
+      "exec_mode": "fork_mode",
+      "script": "./app.js",
+      "name": "web.2",
+      "node_args": [],
+      "env": {
+        "PORT": 5200
+      },
+      "error_file": "./web.2.err.log",
+      "out_file": "./web.2.out.log"
+    },
+    {
+      "exec_mode": "fork_mode",
+      "script": "./app.js",
+      "name": "web.3",
+      "node_args": [],
+      "env": {
+        "PORT": 5300
+      },
+      "error_file": "./web.3.err.log",
+      "out_file": "./web.3.out.log"
     }
   ]
 }
