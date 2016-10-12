@@ -13,7 +13,7 @@ module.exports.admin = {
   hosts: [
     'localhost',
     'localhost:1337',
-    'redirect.dok'
+    '104.199.27.139'
   ],
 
   checkPassword: function(username, hash) {
