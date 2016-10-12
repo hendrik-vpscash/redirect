@@ -1,0 +1,13 @@
+{
+  "apps": [
+    {
+      "exec_mode": "fork_mode",
+      "script": "./app.js",
+      "name": "web.0",
+      "node_args": [],
+      "env": {},
+      "error_file": "./web.0.err.log",
+      "out_file": "./web.0.out.log"
+    }
+  ]
+}
