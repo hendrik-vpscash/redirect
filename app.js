@@ -88,12 +88,14 @@ var server = http.createServer(function(request, response) {
   // request.params shim
   request.params = (function(url) {
     url = url || this.url;
-    var query  = url.split('?').pop(),
-        vars   = query.split('&'),
-        output = {};
-    for(var i = 0 ; i < vars.length; i++) {
-      var pair = vars[i].split('=');
-      output[decodeURIComponent(pair[0])]=decodeURIComponent(pair[1]);
+    var output = {};
+    if (url.indexOf('?') >= 0) {
+      var query  = url.split('?').pop(),
+          vars   = query.split('&');
+      for(var i = 0 ; i < vars.length; i++) {
+        var pair = vars[i].split('=');
+        output[decodeURIComponent(pair[0])]=decodeURIComponent(pair[1]);
+      }
     }
     return output;
   }).bind(request);
@@ -112,9 +114,9 @@ var server = http.createServer(function(request, response) {
       if (err) return reject(err);
       if (!rows.length) return reject(404);
 
-      // Fetch target & query
+      // Build target to aim at
       var params = _.merge({},request.params(),request.params(decodeURIComponent(rows[0].target))),
-          target = decodeURIComponent(rows[0].target).split('?').shift() + http_build_query(params);
+          target = decodeURIComponent(rows[0].target).split('?').shift() + '?' + http_build_query(params);
 
       // Write the permanent redirect
       response.writeHead(301, {
