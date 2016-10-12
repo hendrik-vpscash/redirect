@@ -89,16 +89,16 @@ var server = http.createServer(function(request, response) {
       if (!rows.length) return reject(404);
 
       // Write the permanent redirect
-      response.writeHead(301, {
+      response.writeHead(302, {
         location: decodeURIComponent(rows[0].target)
       });
       response.end();
-      resolve(301);
+      resolve(302);
     });
   })
     .then(function(result) {
       // Successful
-      if (result==301) return;
+      if (result==302) return;
 
       // Admin interface
       if (result==204) {
@@ -121,7 +121,7 @@ var server = http.createServer(function(request, response) {
 
           fs.readFile(filename, function(err, file) {
             if (err) {
-              response.writeHead(301, {
+              response.writeHead(302, {
                 location: '/login.html'
               });
               return response.end();
@@ -133,7 +133,7 @@ var server = http.createServer(function(request, response) {
           })
         }
 
-        if (/(^\/login.html|^\/assets\/.*)/.test(uri)) {
+        if (/(^\/login\.html|^\/assets\/.*)/.test(uri)) {
           return handle();
         }
 
@@ -179,9 +179,10 @@ var server = http.createServer(function(request, response) {
           })
           .then(handle)
           .catch(function() {
-            response.writeHead(403);
-            response.write('Permission denied');
-            response.end();
+            response.writeHead(302, {
+              location: '/login.html'
+            });
+            return response.end();
           });
 
       }
