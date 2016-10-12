@@ -11,9 +11,7 @@ module.exports.admin = {
   },
 
   hosts: [
-    'localhost',
-    'localhost:1337',
-    '104.199.27.139'
+    'redirect.vpscash.nl'
   ],
 
   checkPassword: function(username, hash) {
