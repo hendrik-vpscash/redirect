@@ -6,7 +6,8 @@ var config  = global.config = require('./config'),
     fs      = require('fs'),
     path    = require('path'),
     mime    = require('mime-types'),
-    hbs     = require('handlebars');
+    hbs     = require('handlebars')
+    _       = require('lodash');
 
 // Connect to mysql server
 var db = mysql.createConnection(config.database[process.env.DB || config.database.default]);
@@ -57,22 +58,45 @@ fs.readdir(config.http.docroot, function(err,files) {
   })
 });
 
+// Doesn't do multi-dimensional
+function http_build_query(values) {
+  var output = '';
+  for(var i in values) {
+    if (!values.hasOwnProperty(i)) continue;
+    output += output.length ? '&' : '';
+    output += prefix = encodeURIComponent(i)+'='+encodeURIComponent(values[i]);
+  }
+  return output;
+}
+
 // The redirect server
 var server = http.createServer(function(request, response) {
 
   // request.param shim
-  if (!request.param) {
-    request.param = function(key) {
-      var query = request.url.split('?').pop(),
-          vars  = query.split('&');
-      for(var i = 0 ; i < vars.length; i++) {
-        var pair = vars[i].split('=');
-        if (decodeURIComponent(pair[0]) == key) {
-          return decodeURIComponent(pair[1]);
-        }
+  request.param = (function(key,url) {
+    url = url || this.url;
+    var query = url.split('?').pop(),
+        vars  = query.split('&');
+    for(var i = 0 ; i < vars.length; i++) {
+      var pair = vars[i].split('=');
+      if (decodeURIComponent(pair[0]) == key) {
+        return decodeURIComponent(pair[1]);
       }
     }
-  }
+  }).bind(request);
+
+  // request.params shim
+  request.params = (function(url) {
+    url = url || this.url;
+    var query  = url.split('?').pop(),
+        vars   = query.split('&'),
+        output = {};
+    for(var i = 0 ; i < vars.length; i++) {
+      var pair = vars[i].split('=');
+      output[decodeURIComponent(pair[0])]=decodeURIComponent(pair[1]);
+    }
+    return output;
+  }).bind(request);
 
   new Promise(function(resolve, reject) {
 
@@ -88,17 +112,21 @@ var server = http.createServer(function(request, response) {
       if (err) return reject(err);
       if (!rows.length) return reject(404);
 
+      // Fetch target & query
+      var params = _.merge({},request.params(),request.params(decodeURIComponent(rows[0].target))),
+          target = decodeURIComponent(rows[0].target).split('?').shift() + http_build_query(params);
+
       // Write the permanent redirect
-      response.writeHead(302, {
-        location: decodeURIComponent(rows[0].target)
+      response.writeHead(301, {
+        location: target
       });
       response.end();
-      resolve(302);
+      resolve(301);
     });
   })
     .then(function(result) {
       // Successful
-      if (result==302) return;
+      if (result==301) return;
 
       // Admin interface
       if (result==204) {
