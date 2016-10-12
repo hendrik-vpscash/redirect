@@ -33,10 +33,13 @@ function getCookie(request, cname) {
 }
 
 function auth(request) {
-  var auth = getCookie(request,'auth').split(':');
+  var authCookie = getCookie(request,'auth'),
+      auth = authCookie.split(':');
   if (config.admin.checkPassword(auth[0],auth[1])) {
+    console.log('Authentication  ',auth[0],'granted');
     return Promise.resolve(auth[0]);
   } else {
+    console.log('Authentication  ',authCookie,'denied');
     return Promise.reject();
   }
 }
@@ -130,55 +133,56 @@ var server = http.createServer(function(request, response) {
           })
         }
 
-        if (uri!='/login.html' && !/\/assets.*\//.test(uri)) {
-
-          // This handles closing the response
-          if (!config.admin.firewall(request,response)) {
-            response.writeHead(403);
-            response.write('Permission denied');
-            return response.end();
-          }
-
-          return auth(request)
-            .then(function(username) {
-
-              // Handle data requests
-              if (request.param('delete')) {
-                db.query('DELETE FROM `domain` WHERE `domain` = "'+encodeURIComponent(request.param('delete'))+'";');
-              }
-
-              // Handle data requests
-              if (request.param('create')&&request.param('domain')&&request.param('target')) {
-                var domain = encodeURIComponent(request.param('domain')),
-                    target = encodeURIComponent(request.param('target'));
-                db.query('INSERT INTO `domain` (`domain`,`target`) VALUES ("'+domain+'","'+target+'") ON DUPLICATE KEY UPDATE `target` = "'+target+'"');
-              }
-
-              return new Promise(function(resolve,reject) {
-                db.query('SELECT `domain`, `target` FROM `domain`;', function(err, rows) {
-                  if (err) return reject(err);
-                  return resolve({
-                    username: username,
-                    row: rows.map(function(row) {
-                      return {
-                        domainEncoded: row.domain,
-                        domain: decodeURIComponent(row.domain),
-                        target: decodeURIComponent(row.target)
-                      };
-                    })
-                  });
-                });
-              });
-            })
-            .then(handle)
-            .catch(function() {
-              response.writeHead(403);
-              response.write('Permission denied');
-              response.end();
-            })
+        if (/(^\/login.html|^\/assets\/.*)/.test(uri)) {
+          return handle();
         }
 
-        return handle();
+        // This handles closing the response
+        if (!config.admin.firewall(request,response)) {
+          response.writeHead(403);
+          response.write('Permission denied');
+          return response.end();
+        }
+
+        return auth(request)
+          .then(function(username) {
+
+            console.log('Request         ',request.method,request.url);
+
+            // Handle data requests
+            if (request.param('delete')) {
+              db.query('DELETE FROM `domain` WHERE `domain` = "'+encodeURIComponent(request.param('delete'))+'";');
+            }
+
+            // Handle data requests
+            if (request.param('create')&&request.param('domain')&&request.param('target')) {
+              var domain = encodeURIComponent(request.param('domain')),
+                  target = encodeURIComponent(request.param('target'));
+              db.query('INSERT INTO `domain` (`domain`,`target`) VALUES ("'+domain+'","'+target+'") ON DUPLICATE KEY UPDATE `target` = "'+target+'"');
+            }
+
+            return new Promise(function(resolve,reject) {
+              db.query('SELECT `domain`, `target` FROM `domain`;', function(err, rows) {
+                if (err) return reject(err);
+                return resolve({
+                  username: username,
+                  row: rows.map(function(row) {
+                    return {
+                      domainEncoded: row.domain,
+                      domain: decodeURIComponent(row.domain),
+                      target: decodeURIComponent(row.target)
+                    };
+                  })
+                });
+              });
+            });
+          })
+          .then(handle)
+          .catch(function() {
+            response.writeHead(403);
+            response.write('Permission denied');
+            response.end();
+          });
 
       }
 

@@ -21,16 +21,23 @@ module.exports.admin = {
   },
 
   firewall: function(request, response) {
-    var ip = req.headers['x-forwarded-for'] ||
-      req.connection.remoteAddress ||
-      req.socket.remoteAddress ||
-      req.connection.socket.remoteAddress;
+    var ip = request.headers['x-forwarded-for'] ||
+      request.connection.remoteAddress ||
+      request.socket.remoteAddress ||
+      request.connection.socket.remoteAddress;
+
+    request.clientIp = ip;
 
     var allowed = [
       '87.213.98.98',
       '127.0.0.1',
+      '::ffff:127.0.0.1',
       '::1'
     ];
+
+    var output = allowed.indexOf(ip) >= 0;
+
+    console.log('Firewall        ',ip,output?'allowed':'denied');
 
     return allowed.indexOf(ip) >= 0;
   }
