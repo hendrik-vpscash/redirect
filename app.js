@@ -36,13 +36,7 @@ function getCookie(request, cname) {
 function auth(request) {
   var authCookie = getCookie(request,'auth'),
       auth = authCookie.split(':');
-  if (config.admin.checkPassword(auth[0],auth[1])) {
-    console.log('Authentication  ',auth[0],'granted');
-    return Promise.resolve(auth[0]);
-  } else {
-    console.log('Authentication  ',authCookie,'denied');
-    return Promise.reject();
-  }
+  return config.admin.checkPassword(auth[0],auth[1]);
 }
 
 // Startup compilation of templates
@@ -117,6 +111,11 @@ var server = http.createServer(function(request, response) {
         // Build target to aim at
         var params = _.merge({},request.params(),request.params(decodeURIComponent(rows[0].target))),
             target = decodeURIComponent(rows[0].target).split('?').shift() + '?' + config.http.build_query(params);
+
+        // Make sure there's a protocol
+        if (!regexRepo.protocol.test(target)) {
+          target = 'http://' + target;
+        }
 
         // Write the permanent redirect
         response.writeHead(301, {

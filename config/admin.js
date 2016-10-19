@@ -1,4 +1,5 @@
-var crypto = require('crypto');
+var crypto  = require('crypto'),
+    Promise = require('bluebird');
 
 module.exports.admin = {
 
@@ -16,7 +17,13 @@ module.exports.admin = {
   ],
 
   checkPassword: function(username, hash) {
-        return crypto.createHash('sha256').update(username+config.admin.users[username]).digest('base64') == hash;
+    if (crypto.createHash('sha256').update(username+config.admin.users[username]).digest('base64') == hash) {
+      console.log('Authentication  ',username,'granted');
+      return Promise.resolve(username);
+    } else {
+      console.log('Authentication  ',username,'denied');
+      return Promise.reject();
+    }
   },
 
   firewall: function(request, response) {
