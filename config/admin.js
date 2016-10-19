@@ -13,7 +13,8 @@ module.exports.admin = {
   },
 
   hosts: [
-    'redirect.vpscash.nl'
+    'redirect.vpscash.nl',
+    'redirect.dok'
   ],
 
   checkPassword: function(username, hash) {
