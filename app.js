@@ -90,8 +90,7 @@ var server = http.createServer(function(request, response) {
       return resolve(204);
     }
 
-    var encodedHost = encodeURIComponent(request.headers.host),
-        likeHost    = encodedHost.replace(regexRepo['%'], '\\%');
+    var encodedHost = encodeURIComponent(request.headers.host);
 
     // Queries are in order of priority
     var queries = [
