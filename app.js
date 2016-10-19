@@ -10,7 +10,7 @@ var config  = global.config = require('./config'),
     _       = require('lodash');
 
 // Connect to mysql server
-var db = mysql.createConnection(config.database[process.env.DB || config.database.default]);
+var db = global.db = mysql.createConnection(config.database[process.env.DB || config.database.default]);
 db.connect();
 
 function mimetype(filename) {
