@@ -96,8 +96,8 @@ var server = http.createServer(function(request, response) {
     // Queries are in order of priority
     var queries = [
       'SELECT `target` FROM `domain` WHERE `domain` = "' + encodedHost + '";',
-      'SELECT `target` FROM `domain` WHERE `domain` LIKE "%.' + likeHost + '";',
-      'SELECT `target` FROM `domain` WHERE `domain` LIKE "%' + likeHost + '";'
+      'SELECT `target` FROM `domain` WHERE "'+encodedHost+'" LIKE CONCAT("%.",`domain`)',
+      'SELECT `target` FROM `domain` WHERE "'+encodedHost+'" LIKE CONCAT("%",`domain`)'
     ];
 
     (function next() {
