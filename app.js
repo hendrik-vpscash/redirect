@@ -6,11 +6,11 @@ var config  = global.config = require('./config'),
     fs      = require('fs'),
     path    = require('path'),
     mime    = require('mime-types'),
-    hbs     = require('handlebars')
+    hbs     = require('handlebars'),
     _       = require('lodash');
 
 // Connect to mysql server
-var db = mysql.createConnection(config.database[process.env.DB || config.database.default]);
+var db = global.db = mysql.createConnection(config.database[process.env.DB || config.database.default]);
 db.connect();
 
 function mimetype(filename) {
@@ -36,38 +36,22 @@ function getCookie(request, cname) {
 function auth(request) {
   var authCookie = getCookie(request,'auth'),
       auth = authCookie.split(':');
-  if (config.admin.checkPassword(auth[0],auth[1])) {
-    console.log('Authentication  ',auth[0],'granted');
-    return Promise.resolve(auth[0]);
-  } else {
-    console.log('Authentication  ',authCookie,'denied');
-    return Promise.reject();
-  }
+  return config.admin.checkPassword(auth[0],auth[1]);
 }
 
 // Startup compilation of templates
-var precompiled = {};
-var reg = /(.*)\.hbs$/i;
+var precompiled = {},
+    regexRepo   = config.regexRepository;
+
 fs.readdir(config.http.docroot, function(err,files) {
   files.forEach(function(file) {
-    var matches = reg.exec(file);
+    var matches = regexRepo.hbsFile.exec(file);
     if (!matches) return;
     fs.readFile(path.join(config.http.docroot, file), function(err,contents) {
       precompiled[path.join(config.http.docroot,matches[1]+'.html')] = hbs.compile(contents.toString());
     })
   })
 });
-
-// Doesn't do multi-dimensional
-function http_build_query(values) {
-  var output = '';
-  for(var i in values) {
-    if (!values.hasOwnProperty(i)) continue;
-    output += output.length ? '&' : '';
-    output += prefix = encodeURIComponent(i)+'='+encodeURIComponent(values[i]);
-  }
-  return output;
-}
 
 // The redirect server
 var server = http.createServer(function(request, response) {
@@ -106,25 +90,40 @@ var server = http.createServer(function(request, response) {
       return resolve(204);
     }
 
-    // Check if the host is known
-    var q = 'SELECT `target` FROM `domain` WHERE `domain` = "' + encodeURIComponent(request.headers.host) + '";';
-    db.query(q, function(err, rows) {
+    var encodedHost = encodeURIComponent(request.headers.host);
 
-      // Make sure we have a valid response
-      if (err) return reject(err);
-      if (!rows.length) return reject(404);
+    // Queries are in order of priority
+    var queries = [
+      'SELECT `target` FROM `domain` WHERE `domain` = "' + encodedHost + '";',
+      'SELECT `target` FROM `domain` WHERE "'+encodedHost+'" LIKE CONCAT("%.",`domain`)',
+      'SELECT `target` FROM `domain` WHERE "'+encodedHost+'" LIKE CONCAT("%",`domain`)'
+    ];
 
-      // Build target to aim at
-      var params = _.merge({},request.params(),request.params(decodeURIComponent(rows[0].target))),
-          target = decodeURIComponent(rows[0].target).split('?').shift() + '?' + http_build_query(params);
+    (function next() {
+      var q = queries.shift();
+      if (!q) return reject(404);
 
-      // Write the permanent redirect
-      response.writeHead(301, {
-        location: target
+      db.query(q, function(err, rows) {
+        if (err) return reject(err);
+        if (!rows.length) return next();
+
+        // Build target to aim at
+        var params = _.merge({},request.params(),request.params(decodeURIComponent(rows[0].target))),
+            target = decodeURIComponent(rows[0].target).split('?').shift() + '?' + config.http.build_query(params);
+
+        // Make sure there's a protocol
+        if (!regexRepo.protocol.test(target)) {
+          target = 'http://' + target;
+        }
+
+        // Write the permanent redirect
+        response.writeHead(301, {
+          location: target
+        });
+        response.end();
+        resolve(301);
       });
-      response.end();
-      resolve(301);
-    });
+    })();
   })
     .then(function(result) {
       // Successful

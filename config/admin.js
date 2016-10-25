@@ -1,4 +1,5 @@
-var crypto = require('crypto');
+var crypto  = require('crypto'),
+    Promise = require('bluebird');
 
 module.exports.admin = {
 
@@ -12,11 +13,22 @@ module.exports.admin = {
   },
 
   hosts: [
-    'redirect.vpscash.nl'
+    'redirect.vpscash.nl',
+    'redirect.dok'
   ],
 
   checkPassword: function(username, hash) {
-        return crypto.createHash('sha256').update(username+config.admin.users[username]).digest('base64') == hash;
+
+    var environment = process.env.ENVIRONMENT || 'production';
+    if ( environment === 'test' && username === 'test' ) return Promise.resolve(username);
+
+    if (crypto.createHash('sha256').update(username+config.admin.users[username]).digest('base64') == hash) {
+      console.log('Authentication  ',username,'granted');
+      return Promise.resolve(username);
+    } else {
+      console.log('Authentication  ',username,'denied');
+      return Promise.reject();
+    }
   },
 
   firewall: function(request, response) {
@@ -29,6 +41,7 @@ module.exports.admin = {
 
     var allowed = [
       '87.213.98.98',
+      '192.168.56.1',
       '127.0.0.1',
       '::ffff:127.0.0.1',
       '::1'
