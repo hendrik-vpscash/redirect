@@ -5,7 +5,7 @@ module.exports.admin = {
 
   users: {
     'ronald@vpscash' : 'UR82foi8bofd1wbcbBYPaDgGxLoNF/Tg9d24Mv852Eo=',
-    'robin@vpscash'  : 'aEBmq9G7cFeNlHVYD+Qnp5CkbhQmgd1bHbfLC5s97j4=',
+    'robin@vpscash'  : 'q4rhuDZRIyUmiJXCpTYXEM02TxffxDRStPa494t7SSY=',
     'stephan@vpscash': 'Zvzex2bSGjQ5hzcfIavhhrbL9We4vhaxN55QXcUXMxk=',
     'henk@vpscash'   : 'B47o/8fIg4+LSZ1w5VgH4VzDI9ed2NpteI6eKeOHgLY=',
     'gaby@vpscash'   : 'AzJdsLwXzQ/wT6Q+SJzzzm7jGKrMwEI1IzkAM9aB+UQ=',
