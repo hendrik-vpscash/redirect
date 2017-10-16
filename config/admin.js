@@ -15,7 +15,8 @@ module.exports.admin = {
 
   hosts: [
     'redirect.vpscash.nl',
-    'redirect.dok'
+    'redirect.dok',
+    'localhost:1337'
   ],
 
   checkPassword: function(username, hash) {
@@ -49,10 +50,8 @@ module.exports.admin = {
     ];
 
     var output = allowed.indexOf(ip) >= 0;
-
     console.log('Firewall        ',ip,output?'allowed':'denied');
-
-    return allowed.indexOf(ip) >= 0;
+    return output;
   }
 
 };

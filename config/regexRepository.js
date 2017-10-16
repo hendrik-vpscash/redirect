@@ -1,5 +1,6 @@
 module.exports.regexRepository = {
-  "hbsFile" : /(.*)\.hbs$/i,
-  "%"       : /%/g,
-  "protocol": /^(https?|s?ftp):\/\//i
+  "hbsFile"       : /(.*)\.hbs$/i,
+  "%"             : /%/g,
+  "optionalParams": /^\[[\w\- ]+]$/g,
+  "protocol"      : /^(https?|s?ftp):\/\//i
 };

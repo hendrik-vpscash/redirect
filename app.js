@@ -108,7 +108,22 @@ var server = http.createServer(function(request, response) {
         if (!rows.length) return next();
 
         // Build target to aim at
-        var params = _.merge({},request.params(),request.params(decodeURIComponent(rows[0].target))),
+        var optionalParams = request.params(decodeURIComponent(rows[0].target)),
+            forcedParams   = {};
+
+        // Separate optional & forced params
+        // Strip brackets from optional params
+        Object.keys(optionalParams).forEach(function(key) {
+          if (regexRepo.optionalParams.test(optionalParams[key])) {
+            optionalParams[key] = optionalParams[key].substr(1,optionalParams[key].length-2);
+          } else {
+            forcedParams[key] = optionalParams[key];
+            delete optionalParams[key];
+          }
+        });
+
+        // Construct target
+        var params = _.merge({},optionalParams,request.params(),forcedParams),
             target = decodeURIComponent(rows[0].target).split('?').shift() + '?' + config.http.build_query(params);
 
         // Make sure there's a protocol
