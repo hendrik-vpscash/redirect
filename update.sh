@@ -4,7 +4,7 @@
 cd $(dirname $0)
 
 # Update all references
-git fetch --al &>/dev/null
+git fetch --all &>/dev/null
 
 # Fetch hashes
 UPSTREAM=${1:-'@{u}'}
