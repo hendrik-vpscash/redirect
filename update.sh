@@ -19,6 +19,7 @@ if [ $LOCAL = $REMOTE ]; then
 elif [ $LOCAL = $BASE ]; then
   # Updates available
   git pull
+  pm2 restart all
 elif [ $REMOTE = $BASE ]; then
   # Remote outdated
   git push
