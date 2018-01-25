@@ -8,9 +8,10 @@ module.exports.admin = {
     'robin@vpscash'  : '27jDTBnQXxfKz+JsSdxctIapczTC2HtgmsSFVBp8DNk=',
     'stephan@vpscash': 'Zvzex2bSGjQ5hzcfIavhhrbL9We4vhaxN55QXcUXMxk=',
     'henk@vpscash'   : 'B47o/8fIg4+LSZ1w5VgH4VzDI9ed2NpteI6eKeOHgLY=',
-    'hendrik@vpscash': 'a9S9QVHGEbefkVEw35ajLrwPJ7+wFsoAqfyxFiA+DgE=',
+    'hendrik@vpscash': 'qf4X5d510XH0zkeIgjU+p6gC7Ed61JyUFzCnjGqQG7I=',
     'gaby@vpscash'   : 'AzJdsLwXzQ/wT6Q+SJzzzm7jGKrMwEI1IzkAM9aB+UQ=',
-    'michiel@vpscash': 'Uf9c5Dr9ogcmhxwYPsRr2mPIHREWjMLNqzeRc4hUrks='
+    'michiel@vpscash': 'Uf9c5Dr9ogcmhxwYPsRr2mPIHREWjMLNqzeRc4hUrks=',
+    'dennis@vpscash' : 'vcZN7kxzItrLlaUft1Fx/GGqjdOjLz46+0CAFGQUWrA='
   },
 
   hosts: [
@@ -20,10 +21,8 @@ module.exports.admin = {
   ],
 
   checkPassword: function(username, hash) {
-
     var environment = process.env.ENVIRONMENT || 'production';
     if ( environment === 'test' && username === 'test' ) return Promise.resolve(username);
-
     if (crypto.createHash('sha256').update(username+config.admin.users[username]).digest('base64') == hash) {
       console.log('Authentication  ',username,'granted');
       return Promise.resolve(username);
